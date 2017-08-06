@@ -134,6 +134,7 @@ public class UserService {
         StringTokenizer tokens = getDecodedAuthKey(authValue);
         String emailId = tokens.nextToken();
         String password = tokens.nextToken();
+        emailId = emailId.toLowerCase();
         System.out.println("EmailID :" + emailId + " Password :" + password);
         List<Users> users = null;
         
@@ -175,6 +176,7 @@ public class UserService {
         StringTokenizer tokens = getDecodedAuthKey(headerAuthKey);
         String emailId = tokens.nextToken();
         String password = tokens.nextToken();
+        emailId = emailId.toLowerCase();
         System.out.println("EmailID :" + emailId + " Password :" + password);
         
         if( user.getUserRole() == UserRole.STUDENT ){
@@ -215,7 +217,7 @@ public class UserService {
         } finally {
             session.close();
         }
-        
+        emailId = emailId.toLowerCase();
         if( ids != null ){
             if( context.equals("SIGNUP") ){
                 for( String id : ids){

@@ -25,7 +25,8 @@ import models.StudentCourse;
 import services.CourseService;
 
 /**
- * REST Web Service
+ * REST Web Service for Course Resource
+ * getCourses, getCourseById, saveCourse, deleteCourseById, updateCourseById
  *
  * @author Dhanraj Patil
  */
@@ -51,6 +52,13 @@ public class CourseResource {
     @Produces(MediaType.APPLICATION_JSON)
     public List<Course> getCourses() {
         return SERVICE.getCourses();
+    }
+    
+    @POST
+    @Path("/saveAll")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public List<Course> saveCourses(List<Course> courses) {
+        return SERVICE.saveCourses(courses);
     }
 
     /**

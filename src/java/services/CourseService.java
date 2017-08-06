@@ -93,17 +93,6 @@ public class CourseService {
     
     public Course createCourse(Course course){
         try{
-            if(course.getEndDate() == null){
-                System.out.println(" End date is null");
-                Calendar calendar = new GregorianCalendar(2019, 4, 21);
-                course.setEndDate(calendar.getTime());
-            }
-            if(course.getStartDate() == null){
-                System.out.println(" start date is null");
-                Calendar calendar = new GregorianCalendar(2017, 2, 20);
-                Date date = calendar.getTime();
-                course.setStartDate(date);
-            }
             session = HibernateUtil.getSessionFactory().openSession();
             Transaction tx = session.beginTransaction();
             Teacher teacher = (Teacher) session.get(Teacher.class, course.getTeacher().getUserId());
@@ -120,6 +109,36 @@ public class CourseService {
             session.close();
         }
         return course;
+    }
+    
+    public List<Course> saveCourses(List<Course> courses){
+        List<Course> coursesWithId = new ArrayList<Course>();
+        try{            
+            session = HibernateUtil.getSessionFactory().openSession();
+            Transaction tx = session.beginTransaction();
+            int count = 0;
+            for(Course course : courses){
+                session.save(course);
+                coursesWithId.add(course);
+                if ( ++count % 10 == 0 ) {
+                    session.flush();
+                    session.clear();
+                }
+            }
+            Course course = coursesWithId.get(0);
+            Teacher teacher = (Teacher) session.get(Teacher.class, course.getTeacher().getUserId());
+            teacher.setNoOfCoursesThought(course.getTeacher().getNoOfCoursesThought());
+            session.update(teacher);
+            tx.commit();
+        }
+        catch(Exception e){
+            coursesWithId = null;
+            System.out.println("Error Occured" + e);
+        }
+        finally{
+            session.close();
+        }
+        return coursesWithId;
     }
     
     public Course deleteCourse(long courseId){
@@ -166,7 +185,7 @@ public class CourseService {
             session = HibernateUtil.getSessionFactory().openSession();
             session.beginTransaction();
             Course course = (Course) session.get(Course.class, courseId);
-            Hibernate.initialize(course.getStudCourses());
+            Hibernate.initialize(course.getStudCourses());  // lazy loading
             studCourses = course.getStudCourses();
             for(StudentCourse studCourse : studCourses){
                 studCourse.getCourse().getTeacher().setPassword("");
